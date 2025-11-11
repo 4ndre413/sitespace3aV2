@@ -9,13 +9,12 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
 
     <style>
-        /* CSS Personalizzato per le Animazioni */
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #0F172A; /* Slate 950 */
+            background-color: #0F172A;
         }
 
-        /* Animazione per le stelle */
+        /* Stelle animate */
         @keyframes blink {
             0%, 100% { opacity: 0.5; }
             50% { opacity: 1; }
@@ -28,7 +27,7 @@
             box-shadow: 0 0 2px 0.5px rgba(255, 255, 255, 0.7);
         }
 
-        /* Animazione di apparizione per i pannelli */
+        /* Animazione entrata pannelli */
         @keyframes fadeInUp {
             0% { opacity: 0; transform: translateY(20px); }
             100% { opacity: 1; transform: translateY(0); }
@@ -38,29 +37,104 @@
             animation-fill-mode: forwards;
         }
 
-        /* Classe per lo scorrimento del contenuto accordion */
+        /* Accordion */
         .accordion-content {
             transition: max-height 0.5s ease-in-out, padding 0.5s ease-in-out;
             overflow: hidden;
             max-height: 0;
-            padding-top: 0 !important; /* Forza padding a 0 quando chiuso */
-            padding-bottom: 0 !important; /* Forza padding a 0 quando chiuso */
+            padding-top: 0 !important;
+            padding-bottom: 0 !important;
         }
         .accordion-content.open {
-            /* Verrà impostato max-height via JS */
             padding-top: 1.5rem !important;
             padding-bottom: 1.5rem !important;
         }
 
-        /* FIX: Gestione della visibilità delle icone */
-        /* Mostra il menu-icon di default (menu chiuso) */
+        /* Icone menu hamburger */
         #menu-toggle-button .menu-icon { display: block; }
-        /* Nascondi il close-icon di default */
         #menu-toggle-button .close-icon { display: none; }
-
-        /* Quando il bottone ha la classe 'open' (il menu è APERTO) */
         #menu-toggle-button.open .menu-icon { display: none; }
         #menu-toggle-button.open .close-icon { display: block; }
+
+        /* -------- LINEA DEL TEMPO -------- */
+
+        .timeline-container {
+            position: relative;
+            max-width: 960px;
+            margin: 0 auto;
+            padding-top: 2rem;
+            padding-bottom: 2rem;
+        }
+
+        .timeline-line {
+            position: absolute;
+            top: 0;
+            bottom: 0;
+            left: 50%;
+            width: 4px;
+            border-radius: 9999px;
+            background: linear-gradient(to bottom, #38bdf8, #6366f1, #0ea5e9);
+            box-shadow: 0 0 20px rgba(59,130,246,0.7);
+        }
+
+        .timeline-item {
+            position: relative;
+            display: flex;
+            justify-content: flex-end;
+            margin: 2.5rem 0;
+        }
+
+        .timeline-item:nth-child(even) {
+            justify-content: flex-start;
+        }
+
+        .timeline-dot {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            width: 18px;
+            height: 18px;
+            transform: translate(-50%, -50%);
+            border-radius: 9999px;
+            background: #e5e7eb;
+            box-shadow: 0 0 15px rgba(59,130,246,0.9);
+            border: 3px solid rgba(59,130,246,0.9);
+        }
+
+        .timeline-card {
+            position: relative;
+            width: 45%;
+            border-radius: 1rem;
+            padding: 1.5rem;
+            background: linear-gradient(135deg, rgba(37,99,235,0.95), rgba(59,130,246,0.9));
+            border: 1px solid rgba(129, 230, 217, 0.35);
+            box-shadow: 0 10px 30px rgba(15,23,42,0.8);
+            color: #e5f2ff;
+        }
+
+        .timeline-item:nth-child(odd) .timeline-card {
+            margin-right: 3rem;
+        }
+
+        .timeline-item:nth-child(even) .timeline-card {
+            margin-left: 3rem;
+        }
+
+        @media (max-width: 768px) {
+            .timeline-line {
+                left: 1.1rem;
+            }
+            .timeline-dot {
+                left: 1.1rem;
+            }
+            .timeline-card {
+                width: 100%;
+                margin: 0 0 0 2.75rem !important;
+            }
+            .timeline-item {
+                justify-content: flex-start;
+            }
+        }
     </style>
 </head>
 
@@ -68,11 +142,10 @@
 
 <div id="app" class="relative min-h-screen overflow-x-hidden">
 
+    <!-- Sfondo spazio -->
     <div id="space-background" class="fixed inset-0 overflow-hidden -z-50">
         <div class="absolute inset-0 bg-gradient-to-b from-slate-950 via-blue-950 to-slate-900"></div>
-
         <div id="stars-container"></div>
-
         <div class="absolute inset-0 opacity-30">
             <div class="absolute top-20 left-10 w-96 h-96 bg-blue-500 rounded-full mix-blend-multiply filter blur-3xl"></div>
             <div class="absolute top-40 right-20 w-96 h-96 bg-purple-500 rounded-full mix-blend-multiply filter blur-3xl"></div>
@@ -80,6 +153,7 @@
         </div>
     </div>
 
+    <!-- MENU BURGER -->
     <div id="menu-container">
         <button
                 id="menu-toggle-button"
@@ -114,10 +188,12 @@
         </div>
     </div>
 
+    <!-- Indicatore scroll -->
     <div id="scroll-indicator-container"></div>
 
     <div class="relative z-20">
 
+        <!-- HERO -->
         <header class="min-h-screen flex items-center justify-center relative px-4">
             <div class="text-center">
                 <div class="mb-8">
@@ -134,9 +210,117 @@
             </div>
         </header>
 
-        <section id="info-section" class="relative z-20 px-4 py-20 md:py-32">
-            <div id="panels-container" class="max-w-3xl mx-auto space-y-6">
+        <!-- LINEA DEL TEMPO COSMICA -->
+        <section id="timeline-section" class="relative z-20 px-4 py-20 md:py-32">
+            <div class="max-w-4xl mx-auto text-center mb-12">
+                <p class="text-sm uppercase tracking-[0.35em] text-blue-300 mb-3">Linea del Tempo</p>
+                <h2 class="text-3xl md:text-4xl font-extrabold text-white mb-4">
+                    Linea del Tempo Cosmica
+                </h2>
+                <p class="text-blue-200">
+                    Dalla nascita dell'universo fino all'era dell'uomo.
+                </p>
             </div>
+
+            <div class="timeline-container">
+                <div class="timeline-line"></div>
+
+                <div class="timeline-item fade-in-up" style="animation-delay: 0.1s; animation-duration: 0.8s;">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-card">
+                        <h3 class="text-lg font-bold text-white mb-1">
+                            Formazione dell'Universo (Big Bang)
+                        </h3>
+                        <p class="text-sm text-blue-100 mb-2">13,8 miliardi di anni fa</p>
+                        <p class="text-sm text-blue-100/90">
+                            Nascita dello spazio, del tempo, della materia e dell'energia: l'inizio di tutto.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="timeline-item fade-in-up" style="animation-delay: 0.2s; animation-duration: 0.8s;">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-card">
+                        <h3 class="text-lg font-bold text-white mb-1">
+                            Inizio Fusione Stellare
+                        </h3>
+                        <p class="text-sm text-blue-100 mb-2">Circa 13,6 miliardi di anni fa</p>
+                        <p class="text-sm text-blue-100/90">
+                            Le prime stelle iniziano a brillare fondendo idrogeno in elio e illuminando l'universo.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="timeline-item fade-in-up" style="animation-delay: 0.3s; animation-duration: 0.8s;">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-card">
+                        <h3 class="text-lg font-bold text-white mb-1">
+                            Formazione della Via Lattea
+                        </h3>
+                        <p class="text-sm text-blue-100 mb-2">Circa 13,5 miliardi di anni fa</p>
+                        <p class="text-sm text-blue-100/90">
+                            Le stelle e le nubi di gas si organizzano nella nostra galassia: la Via Lattea.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="timeline-item fade-in-up" style="animation-delay: 0.4s; animation-duration: 0.8s;">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-card">
+                        <h3 class="text-lg font-bold text-white mb-1">
+                            Nascita del Sistema Solare
+                        </h3>
+                        <p class="text-sm text-blue-100 mb-2">4,6 miliardi di anni fa</p>
+                        <p class="text-sm text-blue-100/90">
+                            Da una nube di gas e polveri si forma il nostro Sole e il disco protoplanetario che darà vita ai pianeti.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="timeline-item fade-in-up" style="animation-delay: 0.5s; animation-duration: 0.8s;">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-card">
+                        <h3 class="text-lg font-bold text-white mb-1">
+                            Formazione della Terra
+                        </h3>
+                        <p class="text-sm text-blue-100 mb-2">4,54 miliardi di anni fa</p>
+                        <p class="text-sm text-blue-100/90">
+                            La Terra si solidifica, subisce impatti violenti e si prepara ad ospitare l'acqua liquida.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="timeline-item fade-in-up" style="animation-delay: 0.6s; animation-duration: 0.8s;">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-card">
+                        <h3 class="text-lg font-bold text-white mb-1">
+                            I Primi Organismi
+                        </h3>
+                        <p class="text-sm text-blue-100 mb-2">Circa 3,7 miliardi di anni fa</p>
+                        <p class="text-sm text-blue-100/90">
+                            Sorgono le prime forme di vita microscopiche negli oceani: batteri e archei.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="timeline-item fade-in-up" style="animation-delay: 0.7s; animation-duration: 0.8s;">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-card">
+                        <h3 class="text-lg font-bold text-white mb-1">
+                            Oggi: L'Era dell'Uomo
+                        </h3>
+                        <p class="text-sm text-blue-100 mb-2">Tempo presente</p>
+                        <p class="text-sm text-blue-100/90">
+                            L'umanità esplora lo spazio con sonde, telescopi e missioni con equipaggio, cercando risposte alle grandi domande cosmiche.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- SEZIONE AGENZIE SPAZIALI -->
+        <section id="info-section" class="relative z-20 px-4 py-20 md:py-32">
+            <div id="panels-container" class="max-w-3xl mx-auto space-y-6"></div>
         </section>
 
         <footer class="relative z-20 text-center py-12 text-blue-300">
@@ -148,7 +332,6 @@
 <script>
     // --- DATA ---
     const spaceAgencies = [
-        // NASA (Formattazione Corretta)
         {
             title: 'NASA',
             content: `
@@ -176,8 +359,6 @@
                 </ul>
             `
         },
-
-        // ESA (Formattazione Corretta)
         {
             title: 'ESA',
             content: `
@@ -199,8 +380,6 @@
                 </ul>
             `
         },
-
-        // ROSCOSMOS (Formattazione Corretta)
         {
             title: 'ROSCOSMOS',
             content: `
@@ -220,8 +399,6 @@
                 </ul>
             `
         },
-
-        // CNSA (Formattazione Corretta)
         {
             title: 'CNSA',
             content: `
@@ -241,8 +418,6 @@
                 </ul>
             `
         },
-
-        // ISRO (Formattazione Corretta)
         {
             title: 'ISRO',
             content: `
@@ -266,19 +441,15 @@
     ];
 
     // --- UTILS ---
-
-    /** Genera un ID compatibile con gli URL (kebab-case) */
     function createId(title) {
         return `section-${title.toLowerCase().replace(/\s/g, '-')}`;
     }
 
-    /** Gestisce l'apertura/chiusura dell'accordion */
     function toggleAccordion(button) {
         const content = button.nextElementSibling;
-        const icon = button.querySelector('svg:last-child'); // Seleziona l'icona freccia
+        const icon = button.querySelector('svg:last-child');
         const isCurrentlyOpen = content.classList.contains('open');
 
-        // Chiudi tutti gli altri
         document.querySelectorAll('.accordion-content.open').forEach(openContent => {
             if (openContent !== content) {
                 openContent.style.maxHeight = "0";
@@ -287,37 +458,26 @@
             }
         });
 
-
         if (!isCurrentlyOpen) {
-            // APRI: Calcola l'altezza reale del contenuto interno e applica max-height
-            // Usiamo un piccolo timeout per garantire che il browser abbia calcolato bene il max-height
             setTimeout(() => {
                 content.classList.add('open');
-                // IMPORTANTE: Calcola l'altezza del DIV interno che contiene il contenuto HTML
                 content.style.maxHeight = content.querySelector('div').scrollHeight + "px";
                 icon.classList.add('rotate-180');
-            }, 10); // Piccolo ritardo per il rendering
-
+            }, 10);
         } else {
-            // CHIUDI: Imposta l'altezza a zero per avviare la transizione
             content.style.maxHeight = "0";
             content.classList.remove('open');
             icon.classList.remove('rotate-180');
         }
     }
 
-    /** Funzione per lo scroll e chiusura menu */
     function handleNavClick(title) {
         const id = createId(title);
         const element = document.getElementById(id);
         if (element) {
-            // Offset per scrollare leggermente più in alto (per evitare che il contenuto sia nascosto dall'header)
             const yOffset = -80;
             const y = element.getBoundingClientRect().top + window.scrollY + yOffset;
-
             window.scrollTo({ top: y, behavior: 'smooth' });
-
-            // Chiudi il menu
             closeMenu();
         }
     }
@@ -341,57 +501,79 @@
         const button = document.getElementById('menu-toggle-button');
 
         if (isMenuOpen) {
-            // APRI
             sidebar.classList.remove('-translate-x-full');
             sidebar.classList.add('translate-x-0');
             overlay.classList.remove('opacity-0', 'invisible');
             overlay.classList.add('opacity-100', 'visible');
-            button.classList.add('open'); // Aggiunge la classe 'open' per cambiare l'icona
+            button.classList.add('open');
         } else {
-            // CHIUDI
             sidebar.classList.remove('translate-x-0');
             sidebar.classList.add('-translate-x-full');
             overlay.classList.remove('opacity-100', 'visible');
             overlay.classList.add('opacity-0', 'invisible');
-            button.classList.remove('open'); // Rimuove la classe 'open'
+            button.classList.remove('open');
         }
     }
 
-    // --- RENDERING DEI DATI ---
+    // --- RENDERING ---
 
-    /** Inietta i link nella sidebar */
     function renderMenuLinks() {
         const navList = document.getElementById('nav-list');
         if (!navList) return;
 
-        let linksHtml = '';
+        // Primo bottone: Linea del Tempo
+        let linksHtml = `
+            <button
+                data-target="timeline-section"
+                class="w-full text-left px-4 py-3 rounded-lg text-blue-100 hover:text-white hover:bg-blue-700/50 transition-all duration-200 transform hover:translate-x-2 hover:shadow-lg hover:shadow-blue-500/30 font-medium whitespace-nowrap mb-2"
+                style="animation-delay: 0ms;"
+            >
+                <span class="inline-block mr-3 text-lg align-middle">🕒</span>
+                Linea del Tempo Cosmica
+            </button>
+        `;
+
+        // Poi le agenzie spaziali
         spaceAgencies.forEach((agency, index) => {
             linksHtml += `
-                    <button
-                        data-title="${agency.title}"
-                        class="w-full text-left px-4 py-3 rounded-lg text-blue-100 hover:text-white hover:bg-blue-700/50 transition-all duration-200 transform hover:translate-x-2 hover:shadow-lg hover:shadow-blue-500/30 font-medium whitespace-nowrap"
-                        style="animation-delay: ${index * 50}ms;"
-                    >
-                        <span class="inline-block mr-3 text-lg align-middle">→</span>
-                        ${agency.title}
-                    </button>
-                `;
+                <button
+                    data-title="${agency.title}"
+                    class="w-full text-left px-4 py-3 rounded-lg text-blue-100 hover:text-white hover:bg-blue-700/50 transition-all duration-200 transform hover:translate-x-2 hover:shadow-lg hover:shadow-blue-500/30 font-medium whitespace-nowrap"
+                    style="animation-delay: ${(index + 1) * 50}ms;"
+                >
+                    <span class="inline-block mr-3 text-lg align-middle">→</span>
+                    ${agency.title}
+                </button>
+            `;
         });
+
         navList.innerHTML = linksHtml;
 
-        // Aggiungi listener per lo scroll
-        document.querySelectorAll('#nav-list button').forEach(button => {
-            button.addEventListener('click', (e) => {
+        // Listener per linea del tempo
+        const timelineBtn = navList.querySelector('button[data-target="timeline-section"]');
+        if (timelineBtn) {
+            timelineBtn.addEventListener('click', () => {
+                const element = document.getElementById('timeline-section');
+                if (element) {
+                    const yOffset = -80;
+                    const y = element.getBoundingClientRect().top + window.scrollY + yOffset;
+                    window.scrollTo({ top: y, behavior: 'smooth' });
+                    closeMenu();
+                }
+            });
+        }
+
+        // Listener per le agenzie
+        document.querySelectorAll('#nav-list button[data-title]').forEach(button => {
+            button.addEventListener('click', () => {
                 handleNavClick(button.dataset.title);
             });
         });
 
-        // Collega i listener al bottone hamburger e all'overlay
         document.getElementById('menu-toggle-button').addEventListener('click', toggleMenu);
         document.getElementById('menu-overlay').addEventListener('click', closeMenu);
     }
 
-    /** Inietta i pannelli informativi */
     function renderInformationPanels() {
         const container = document.getElementById('panels-container');
         if (!container) return;
@@ -401,47 +583,43 @@
             const id = createId(agency.title);
 
             panelsHtml += `
-                    <div
-                        class="fade-in-up"
-                        id="${id}"
-                        style="animation-delay: ${index * 0.1}s; animation-duration: 0.8s"
+                <div
+                    class="fade-in-up"
+                    id="${id}"
+                    style="animation-delay: ${index * 0.1}s; animation-duration: 0.8s"
+                >
+                    <button
+                        class="w-full relative group overflow-hidden rounded-2xl bg-gradient-to-r from-blue-700 to-blue-600 p-6 text-left transition-all duration-300 hover:from-blue-600 hover:to-blue-500 hover:shadow-lg hover:shadow-blue-500/50"
+                        aria-expanded="false"
+                        onclick="toggleAccordion(this)"
                     >
-                        <button
-                            class="w-full relative group overflow-hidden rounded-2xl bg-gradient-to-r from-blue-700 to-blue-600 p-6 text-left transition-all duration-300 hover:from-blue-600 hover:to-blue-500 hover:shadow-lg hover:shadow-blue-500/50"
-                            aria-expanded="false"
-                            onclick="toggleAccordion(this)"
-                        >
-                            <div class="flex items-center justify-between">
-                                <h3 class="text-xl font-bold text-white capitalize">${agency.title}</h3>
-                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-down h-6 w-6 text-white transition-transform duration-300"><path d="m6 9 6 6 6-6"/></svg>
-                            </div>
-                        </button>
-
-                        <div
-                            class="accordion-content border-2 border-t-0 border-blue-700 bg-blue-50/10 backdrop-blur-sm"
-                        >
-                            <div class="p-6 pt-4"> ${agency.content}
-                            </div>
+                        <div class="flex items-center justify-between">
+                            <h3 class="text-xl font-bold text-white capitalize">${agency.title}</h3>
+                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-down h-6 w-6 text-white transition-transform duration-300"><path d="m6 9 6 6 6-6"/></svg>
                         </div>
+                    </button>
+
+                    <div class="accordion-content border-2 border-t-0 border-blue-700 bg-blue-50/10 backdrop-blur-sm">
+                        <div class="p-6 pt-4">${agency.content}</div>
                     </div>
-                `;
+                </div>
+            `;
         });
         container.innerHTML = panelsHtml;
     }
 
-    // Logica di visibilità indicatore
     function renderScrollIndicator() {
         const container = document.getElementById('scroll-indicator-container');
         if (!container) return;
 
         container.innerHTML = `
-                <div class="fixed bottom-8 left-1/2 -translate-x-1/2 z-10 animate-bounce transition-opacity duration-300" id="scroll-indicator">
-                    <div class="flex flex-col items-center gap-2">
-                        <span class="text-sm text-blue-300 font-medium">Scorri per scoprire</span>
-                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-down h-6 w-6 text-blue-400"><path d="m6 9 6 6 6-6"/></svg>
-                    </div>
+            <div class="fixed bottom-8 left-1/2 -translate-x-1/2 z-10 animate-bounce transition-opacity duration-300" id="scroll-indicator">
+                <div class="flex flex-col items-center gap-2">
+                    <span class="text-sm text-blue-300 font-medium">Scorri per scoprire</span>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-down h-6 w-6 text-blue-400"><path d="m6 9 6 6 6-6"/></svg>
                 </div>
-            `;
+            </div>
+        `;
         const indicator = document.getElementById('scroll-indicator');
         if (indicator) {
             window.addEventListener('scroll', () => {
@@ -451,7 +629,6 @@
         }
     }
 
-    // Inietta le stelle nello sfondo
     function renderSpaceBackground() {
         const starsContainer = document.getElementById('stars-container');
         const numStars = 200;
@@ -465,38 +642,35 @@
             const delay = Math.random() * 2;
 
             starsHtml += `
-                    <div
-                        class="star absolute rounded-full bg-white"
-                        style="
-                            left: ${x}%;
-                            top: ${y}%;
-                            width: ${size}px;
-                            height: ${size}px;
-                            animation-delay: ${delay}s;
-                            animation-duration: ${duration}s;
-                        "
-                    ></div>
-                `;
+                <div
+                    class="star absolute rounded-full bg-white"
+                    style="
+                        left: ${x}%;
+                        top: ${y}%;
+                        width: ${size}px;
+                        height: ${size}px;
+                        animation-delay: ${delay}s;
+                        animation-duration: ${duration}s;
+                    "
+                ></div>
+            `;
         }
         starsContainer.innerHTML = starsHtml;
     }
 
-
-    // --- ESECUZIONE (Chiamata quando il DOM è pronto) ---
+    // --- INIT ---
     document.addEventListener('DOMContentLoaded', function() {
         renderSpaceBackground();
-        renderInformationPanels(); // Crea i pannelli e la loro logica
+        renderInformationPanels();
         renderScrollIndicator();
-        renderMenuLinks();         // Crea i link del menu e i listener
+        renderMenuLinks();
 
-        // Attiva le animazioni di entrata per i pannelli
         setTimeout(() => {
             document.querySelectorAll('.fade-in-up').forEach((el) => {
                 el.style.animationName = 'fadeInUp';
             });
         }, 100);
 
-        // Inizializzazione delle icone Lucide
         if (typeof lucide !== 'undefined') {
             lucide.createIcons();
         }
