@@ -1,0 +1,521 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Esplorando lo Spazio</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+
+    <style>
+        /* CSS Personalizzato per le Animazioni */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0F172A; /* Slate 950 */
+        }
+
+        /* Animazione per le stelle */
+        @keyframes blink {
+            0%, 100% { opacity: 0.5; }
+            50% { opacity: 1; }
+        }
+        .star {
+            animation-name: blink;
+            animation-timing-function: ease-in-out;
+            animation-iteration-count: infinite;
+            animation-direction: alternate;
+            box-shadow: 0 0 2px 0.5px rgba(255, 255, 255, 0.7);
+        }
+
+        /* Animazione di apparizione per i pannelli */
+        @keyframes fadeInUp {
+            0% { opacity: 0; transform: translateY(20px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+        .fade-in-up {
+            opacity: 0;
+            animation-fill-mode: forwards;
+        }
+
+        /* Classe per lo scorrimento del contenuto accordion */
+        .accordion-content {
+            transition: max-height 0.5s ease-in-out, padding 0.5s ease-in-out;
+            overflow: hidden;
+            max-height: 0;
+            padding-top: 0 !important; /* Forza padding a 0 quando chiuso */
+            padding-bottom: 0 !important; /* Forza padding a 0 quando chiuso */
+        }
+        .accordion-content.open {
+            /* Verrà impostato max-height via JS */
+            padding-top: 1.5rem !important;
+            padding-bottom: 1.5rem !important;
+        }
+
+        /* FIX: Gestione della visibilità delle icone */
+        /* Mostra il menu-icon di default (menu chiuso) */
+        #menu-toggle-button .menu-icon { display: block; }
+        /* Nascondi il close-icon di default */
+        #menu-toggle-button .close-icon { display: none; }
+
+        /* Quando il bottone ha la classe 'open' (il menu è APERTO) */
+        #menu-toggle-button.open .menu-icon { display: none; }
+        #menu-toggle-button.open .close-icon { display: block; }
+    </style>
+</head>
+
+<body class="antialiased">
+
+<div id="app" class="relative min-h-screen overflow-x-hidden">
+
+    <div id="space-background" class="fixed inset-0 overflow-hidden -z-50">
+        <div class="absolute inset-0 bg-gradient-to-b from-slate-950 via-blue-950 to-slate-900"></div>
+
+        <div id="stars-container"></div>
+
+        <div class="absolute inset-0 opacity-30">
+            <div class="absolute top-20 left-10 w-96 h-96 bg-blue-500 rounded-full mix-blend-multiply filter blur-3xl"></div>
+            <div class="absolute top-40 right-20 w-96 h-96 bg-purple-500 rounded-full mix-blend-multiply filter blur-3xl"></div>
+            <div class="absolute -bottom-8 left-1/2 w-96 h-96 bg-blue-400 rounded-full mix-blend-multiply filter blur-3xl transform -translate-x-1/2"></div>
+        </div>
+    </div>
+
+    <div id="menu-container">
+        <button
+                id="menu-toggle-button"
+                class="fixed top-6 left-6 z-[60] p-3 rounded-lg bg-blue-700 hover:bg-blue-600 transition-all duration-300 hover:shadow-lg hover:shadow-blue-500/50 group"
+                aria-label="Apri menu"
+        >
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-menu w-6 h-6 text-white menu-icon"><line x1="4" x2="20" y1="12" y2="12"/><line x1="4" x2="20" y1="6" y2="6"/><line x1="4" x2="20" y1="18" y2="18"/></svg>
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-x w-6 h-6 text-white close-icon"><path d="M18 6 6 18"/><path d="m6 6 12 12"/></svg>
+        </button>
+
+        <div
+                id="menu-overlay"
+                class="fixed inset-0 bg-black/40 z-40 transition-opacity duration-300 opacity-0 invisible"
+        ></div>
+
+        <div
+                id="sidebar-menu"
+                class="fixed left-0 top-0 h-full w-64 bg-gradient-to-b from-blue-900/90 via-slate-900/90 to-slate-950/90 backdrop-blur-md z-50 transition-transform duration-300 ease-in-out rounded-r-3xl border-r border-blue-500/30 -translate-x-full"
+        >
+            <div class="pt-20 px-6 pb-8 border-b border-blue-500/20">
+                <h2 class="text-2xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-300 to-blue-100">
+                    🚀 Missioni
+                </h2>
+            </div>
+
+            <nav class="px-4 py-6 space-y-2 overflow-y-auto max-h-[calc(100vh-200px)]" id="nav-list">
+            </nav>
+
+            <div class="absolute bottom-0 left-0 right-0 p-4 border-t border-blue-500/20 bg-gradient-to-t from-slate-950 to-transparent">
+                <p class="text-xs text-blue-300 text-center">Esplora lo spazio 🚀</p>
+            </div>
+        </div>
+    </div>
+
+    <div id="scroll-indicator-container"></div>
+
+    <div class="relative z-20">
+
+        <header class="min-h-screen flex items-center justify-center relative px-4">
+            <div class="text-center">
+                <div class="mb-8">
+                    <div class="text-6xl md:text-7xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-300 via-blue-400 to-blue-300 animate-pulse">
+                        <span role="img" aria-label="Rocket">🚀</span>
+                    </div>
+                </div>
+                <h1 class="text-5xl md:text-7xl font-bold text-white mb-6 drop-shadow-lg">
+                    Esplorando lo Spazio
+                </h1>
+                <p class="text-xl md:text-2xl text-blue-200 drop-shadow-md">
+                    Scopri le meraviglie dell'universo e le agenzie aerospaziali
+                </p>
+            </div>
+        </header>
+
+        <section id="info-section" class="relative z-20 px-4 py-20 md:py-32">
+            <div id="panels-container" class="max-w-3xl mx-auto space-y-6">
+            </div>
+        </section>
+
+        <footer class="relative z-20 text-center py-12 text-blue-300">
+            <p class="text-sm">Andrea Macis 🌌</p>
+        </footer>
+    </div>
+</div>
+
+<script>
+    // --- DATA ---
+    const spaceAgencies = [
+        // NASA (Formattazione Corretta)
+        {
+            title: 'NASA',
+            content: `
+                <p class="mb-3">La National Aeronautics and Space Administration (NASA) è l'agenzia spaziale civile degli Stati Uniti e leader mondiale nell'esplorazione e nella ricerca aerospaziale.</p>
+                <ul class="list-disc ml-5 space-y-2 text-blue-100/90">
+                    <li><strong class="text-white">Nome Completo:</strong> National Aeronautics and Space Administration.</li>
+                    <li><strong class="text-white">Fondazione:</strong> 29 luglio 1958 (sotto il Presidente Eisenhower).</li>
+                    <li>
+                        <strong class="text-white">Loghi Principali:</strong>
+                        Il "Meatball" (logo circolare, attuale) e il "Worm" (scritta stilizzata, reintrodotta di recente).
+                    </li>
+                    <li><strong class="text-white">Sede Centrale:</strong> Washington, D.C.</li>
+                    <li><strong class="text-white">Centri Importanti:</strong> Kennedy Space Center (lanci, Florida) e Jet Propulsion Laboratory (missioni robotiche, California).</li>
+                    <li>
+                        <strong class="text-white">Missioni Chiave:</strong>
+                        <ul class="list-circle ml-5 mt-1">
+                            <li>Programma Apollo (portò l'uomo sulla Luna, 1969).</li>
+                            <li>Contributo alla Stazione Spaziale Internazionale (ISS).</li>
+                            <li>Programma Artemis (attuale missione per riportare gli astronauti sulla Luna).</li>
+                            <li>Gestione di telescopi spaziali come Hubble e James Webb.</li>
+                            <li>Rover su Marte (Curiosity e Perseverance).</li>
+                        </ul>
+                    </li>
+                    <li><strong class="text-white">Curiosità:</strong> Ha sviluppato tecnologie "spin-off" per l'uso quotidiano (es. memory foam).</li>
+                </ul>
+            `
+        },
+
+        // ESA (Formattazione Corretta)
+        {
+            title: 'ESA',
+            content: `
+                <p class="mb-3">L'Agenzia Spaziale Europea (ESA) è l'organizzazione intergovernativa che coordina l'esplorazione spaziale europea per scopi pacifici.</p>
+                <ul class="list-disc ml-5 space-y-2 text-blue-100/90">
+                    <li><strong class="text-white">Tipo:</strong> Organizzazione intergovernativa europea.</li>
+                    <li><strong class="text-white">Fondazione:</strong> 1975.</li>
+                    <li><strong class="text-white">Membri:</strong> 22 Stati membri (inclusa l'Italia).</li>
+                    <li><strong class="text-white">Sede Principale:</strong> Parigi, Francia.</li>
+                    <li>
+                        <strong class="text-white">Punti Chiave:</strong>
+                        <ul class="list-circle ml-5 mt-1">
+                            <li>Coordinamento dello spazio europeo per scopi pacifici.</li>
+                            <li>Sviluppa e lancia i vettori <strong class="text-blue-200">Ariane</strong> (dalla base di Kourou, Guyana Francese).</li>
+                            <li>Importanti contributi a missioni scientifiche (es. telescopio James Webb) e osservazione della Terra (es. satelliti Sentinel).</li>
+                            <li>Centro di Ricerca e Tecnologia (ESTEC) nei Paesi Bassi.</li>
+                        </ul>
+                    </li>
+                </ul>
+            `
+        },
+
+        // ROSCOSMOS (Formattazione Corretta)
+        {
+            title: 'ROSCOSMOS',
+            content: `
+                <p class="mb-3">L'Agenzia Spaziale Federale Russa (Roscosmos) è responsabile del programma spaziale russo e continua la ricca eredità spaziale sovietica.</p>
+                <ul class="list-disc ml-5 space-y-2 text-blue-100/90">
+                    <li><strong class="text-white">Tipo:</strong> Agenzia governativa russa.</li>
+                    <li><strong class="text-white">Eredità:</strong> Programma spaziale sovietico (primo satellite, primo uomo nello spazio).</li>
+                    <li><strong class="text-white">Base Principale:</strong> Cosmodromo di Bajkonur (Kazakistan).</li>
+                    <li>
+                        <strong class="text-white">Punti Chiave:</strong>
+                        <ul class="list-circle ml-5 mt-1">
+                            <li>Forniva il principale mezzo di trasporto per gli astronauti verso la ISS tramite le navette <strong class="text-blue-200">Sojuz</strong> per un lungo periodo.</li>
+                            <li>Gestisce il sistema di navigazione satellitare <strong class="text-blue-200">GLONASS</strong>.</li>
+                            <li>Piani futuri includono il proprio segmento orbitale sulla ISS e nuovi lanciatori.</li>
+                        </ul>
+                    </li>
+                </ul>
+            `
+        },
+
+        // CNSA (Formattazione Corretta)
+        {
+            title: 'CNSA',
+            content: `
+                <p class="mb-3">L'Amministrazione Nazionale dello Spazio della Cina (CNSA) è l'agenzia con il programma in più rapida espansione, con l'obiettivo di competere con USA e Russia.</p>
+                <ul class="list-disc ml-5 space-y-2 text-blue-100/90">
+                    <li><strong class="text-white">Tipo:</strong> Agenzia spaziale nazionale cinese.</li>
+                    <li><strong class="text-white">Fondazione:</strong> 1993.</li>
+                    <li>
+                        <strong class="text-white">Punti Chiave:</strong>
+                        <ul class="list-circle ml-5 mt-1">
+                            <li>Grande successo nell'esplorazione lunare con le missioni <strong class="text-blue-200">Chang'e</strong> (inclusi i primi atterraggi sul lato nascosto).</li>
+                            <li>Ha costruito e gestisce la propria stazione spaziale, la <strong class="text-blue-200">Tiangong</strong>.</li>
+                            <li>Successo nelle missioni su Marte (es. <strong class="text-blue-200">Tianwen-1</strong> con orbiter e rover Zhurong).</li>
+                            <li><strong class="text-red-300">Obiettivo Dichiarato:</strong> portare astronauti sulla Luna entro il 2030.</li>
+                        </ul>
+                    </li>
+                </ul>
+            `
+        },
+
+        // ISRO (Formattazione Corretta)
+        {
+            title: 'ISRO',
+            content: `
+                <p class="mb-3">L'Organizzazione di Ricerca Spaziale Indiana (ISRO) è focalizzata sullo sviluppo autonomo di tecnologie spaziali e loro applicazione per lo sviluppo nazionale.</p>
+                <ul class="list-disc ml-5 space-y-2 text-blue-100/90">
+                    <li><strong class="text-white">Tipo:</strong> Organizzazione di ricerca spaziale indiana.</li>
+                    <li><strong class="text-white">Fondazione:</strong> 1969.</li>
+                    <li><strong class="text-white">Sede Principale:</strong> Bangalore, India.</li>
+                    <li>
+                        <strong class="text-white">Punti Chiave:</strong>
+                        <ul class="list-circle ml-5 mt-1">
+                            <li>Nota per lanciare satelliti a costi contenuti per l'India e altri Paesi.</li>
+                            <li>Importanti successi interplanetari, come la missione orbitale su Marte (<strong class="text-blue-200">Mangalyaan</strong>).</li>
+                            <li>Allunaggio storico sulla Luna (<strong class="text-blue-200">Chandrayaan-3</strong>), che ha reso l'India il quarto Paese a riuscirci.</li>
+                            <li>Sta sviluppando il programma con equipaggio umano <strong class="text-blue-200">Gaganyaan</strong>.</li>
+                        </ul>
+                    </li>
+                </ul>
+            `
+        },
+
+        // I seguenti elementi sono stati mantenuti come erano (testo semplice con un tag <p>)
+        {
+            title: 'Blue Origin',
+            content: '<p class="text-base text-blue-100 leading-relaxed">Blue Origin è un\'azienda aerospaziale fondata da Jeff Bezos nel 2000 che sviluppa tecnologie di lancio riutilizzabili e servizi di turismo spaziale. Il New Shepard offre esperienze di volo suborbitale a civili.</p>'
+        },
+        {
+            title: 'Telescopio James Webb',
+            content: '<p class="text-base text-blue-100 leading-relaxed">Il James Webb Space Telescope è il più potente telescopio spaziale mai costruito, lanciato nel 2021. Osserva l\'universo primordiale nell\'infrarosso, permettendo agli scienziati di studiare le galassie più antiche e la formazione stellare.</p>'
+        },
+        {
+            title: 'DA MODIFICARE',
+            content: '<p class="text-base text-blue-100 leading-relaxed">MODIFICA.</p>'
+        },
+    ];
+
+    // --- UTILS ---
+
+    /** Genera un ID compatibile con gli URL (kebab-case) */
+    function createId(title) {
+        return `section-${title.toLowerCase().replace(/\s/g, '-')}`;
+    }
+
+    /** Gestisce l'apertura/chiusura dell'accordion */
+    function toggleAccordion(button) {
+        const content = button.nextElementSibling;
+        const icon = button.querySelector('svg:last-child'); // Seleziona l'icona freccia
+        const isCurrentlyOpen = content.classList.contains('open');
+
+        // Chiudi tutti gli altri
+        document.querySelectorAll('.accordion-content.open').forEach(openContent => {
+            if (openContent !== content) {
+                openContent.style.maxHeight = "0";
+                openContent.classList.remove('open');
+                openContent.previousElementSibling.querySelector('svg:last-child').classList.remove('rotate-180');
+            }
+        });
+
+
+        if (!isCurrentlyOpen) {
+            // APRI: Calcola l'altezza reale del contenuto interno e applica max-height
+            // Usiamo un piccolo timeout per garantire che il browser abbia calcolato bene il max-height
+            setTimeout(() => {
+                content.classList.add('open');
+                // IMPORTANTE: Calcola l'altezza del DIV interno che contiene il contenuto HTML
+                content.style.maxHeight = content.querySelector('div').scrollHeight + "px";
+                icon.classList.add('rotate-180');
+            }, 10); // Piccolo ritardo per il rendering
+
+        } else {
+            // CHIUDI: Imposta l'altezza a zero per avviare la transizione
+            content.style.maxHeight = "0";
+            content.classList.remove('open');
+            icon.classList.remove('rotate-180');
+        }
+    }
+
+    /** Funzione per lo scroll e chiusura menu */
+    function handleNavClick(title) {
+        const id = createId(title);
+        const element = document.getElementById(id);
+        if (element) {
+            // Offset per scrollare leggermente più in alto (per evitare che il contenuto sia nascosto dall'header)
+            const yOffset = -80;
+            const y = element.getBoundingClientRect().top + window.scrollY + yOffset;
+
+            window.scrollTo({ top: y, behavior: 'smooth' });
+
+            // Chiudi il menu
+            closeMenu();
+        }
+    }
+
+    // --- MENU LOGIC ---
+    let isMenuOpen = false;
+
+    function toggleMenu() {
+        isMenuOpen = !isMenuOpen;
+        updateMenuDom();
+    }
+
+    function closeMenu() {
+        isMenuOpen = false;
+        updateMenuDom();
+    }
+
+    function updateMenuDom() {
+        const sidebar = document.getElementById('sidebar-menu');
+        const overlay = document.getElementById('menu-overlay');
+        const button = document.getElementById('menu-toggle-button');
+
+        if (isMenuOpen) {
+            // APRI
+            sidebar.classList.remove('-translate-x-full');
+            sidebar.classList.add('translate-x-0');
+            overlay.classList.remove('opacity-0', 'invisible');
+            overlay.classList.add('opacity-100', 'visible');
+            button.classList.add('open'); // Aggiunge la classe 'open' per cambiare l'icona
+        } else {
+            // CHIUDI
+            sidebar.classList.remove('translate-x-0');
+            sidebar.classList.add('-translate-x-full');
+            overlay.classList.remove('opacity-100', 'visible');
+            overlay.classList.add('opacity-0', 'invisible');
+            button.classList.remove('open'); // Rimuove la classe 'open'
+        }
+    }
+
+    // --- RENDERING DEI DATI ---
+
+    /** Inietta i link nella sidebar */
+    function renderMenuLinks() {
+        const navList = document.getElementById('nav-list');
+        if (!navList) return;
+
+        let linksHtml = '';
+        spaceAgencies.forEach((agency, index) => {
+            linksHtml += `
+                    <button
+                        data-title="${agency.title}"
+                        class="w-full text-left px-4 py-3 rounded-lg text-blue-100 hover:text-white hover:bg-blue-700/50 transition-all duration-200 transform hover:translate-x-2 hover:shadow-lg hover:shadow-blue-500/30 font-medium whitespace-nowrap"
+                        style="animation-delay: ${index * 50}ms;"
+                    >
+                        <span class="inline-block mr-3 text-lg align-middle">→</span>
+                        ${agency.title}
+                    </button>
+                `;
+        });
+        navList.innerHTML = linksHtml;
+
+        // Aggiungi listener per lo scroll
+        document.querySelectorAll('#nav-list button').forEach(button => {
+            button.addEventListener('click', (e) => {
+                handleNavClick(button.dataset.title);
+            });
+        });
+
+        // Collega i listener al bottone hamburger e all'overlay
+        document.getElementById('menu-toggle-button').addEventListener('click', toggleMenu);
+        document.getElementById('menu-overlay').addEventListener('click', closeMenu);
+    }
+
+    /** Inietta i pannelli informativi */
+    function renderInformationPanels() {
+        const container = document.getElementById('panels-container');
+        if (!container) return;
+
+        let panelsHtml = '';
+        spaceAgencies.forEach((agency, index) => {
+            const id = createId(agency.title);
+
+            panelsHtml += `
+                    <div
+                        class="fade-in-up"
+                        id="${id}"
+                        style="animation-delay: ${index * 0.1}s; animation-duration: 0.8s"
+                    >
+                        <button
+                            class="w-full relative group overflow-hidden rounded-2xl bg-gradient-to-r from-blue-700 to-blue-600 p-6 text-left transition-all duration-300 hover:from-blue-600 hover:to-blue-500 hover:shadow-lg hover:shadow-blue-500/50"
+                            aria-expanded="false"
+                            onclick="toggleAccordion(this)"
+                        >
+                            <div class="flex items-center justify-between">
+                                <h3 class="text-xl font-bold text-white capitalize">${agency.title}</h3>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-down h-6 w-6 text-white transition-transform duration-300"><path d="m6 9 6 6 6-6"/></svg>
+                            </div>
+                        </button>
+
+                        <div
+                            class="accordion-content border-2 border-t-0 border-blue-700 bg-blue-50/10 backdrop-blur-sm"
+                        >
+                            <div class="p-6 pt-4"> ${agency.content}
+                            </div>
+                        </div>
+                    </div>
+                `;
+        });
+        container.innerHTML = panelsHtml;
+    }
+
+    // Logica di visibilità indicatore
+    function renderScrollIndicator() {
+        const container = document.getElementById('scroll-indicator-container');
+        if (!container) return;
+
+        container.innerHTML = `
+                <div class="fixed bottom-8 left-1/2 -translate-x-1/2 z-10 animate-bounce transition-opacity duration-300" id="scroll-indicator">
+                    <div class="flex flex-col items-center gap-2">
+                        <span class="text-sm text-blue-300 font-medium">Scorri per scoprire</span>
+                        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-down h-6 w-6 text-blue-400"><path d="m6 9 6 6 6-6"/></svg>
+                    </div>
+                </div>
+            `;
+        const indicator = document.getElementById('scroll-indicator');
+        if (indicator) {
+            window.addEventListener('scroll', () => {
+                indicator.style.opacity = window.scrollY < 100 ? '1' : '0';
+                indicator.style.pointerEvents = window.scrollY < 100 ? 'auto' : 'none';
+            });
+        }
+    }
+
+    // Inietta le stelle nello sfondo
+    function renderSpaceBackground() {
+        const starsContainer = document.getElementById('stars-container');
+        const numStars = 200;
+        let starsHtml = '';
+
+        for (let i = 0; i < numStars; i++) {
+            const x = Math.random() * 100;
+            const y = Math.random() * 100;
+            const size = Math.random() * 2 + 0.5;
+            const duration = Math.random() * 3 + 2;
+            const delay = Math.random() * 2;
+
+            starsHtml += `
+                    <div
+                        class="star absolute rounded-full bg-white"
+                        style="
+                            left: ${x}%;
+                            top: ${y}%;
+                            width: ${size}px;
+                            height: ${size}px;
+                            animation-delay: ${delay}s;
+                            animation-duration: ${duration}s;
+                        "
+                    ></div>
+                `;
+        }
+        starsContainer.innerHTML = starsHtml;
+    }
+
+
+    // --- ESECUZIONE (Chiamata quando il DOM è pronto) ---
+    document.addEventListener('DOMContentLoaded', function() {
+        renderSpaceBackground();
+        renderInformationPanels(); // Crea i pannelli e la loro logica
+        renderScrollIndicator();
+        renderMenuLinks();         // Crea i link del menu e i listener
+
+        // Attiva le animazioni di entrata per i pannelli
+        setTimeout(() => {
+            document.querySelectorAll('.fade-in-up').forEach((el) => {
+                el.style.animationName = 'fadeInUp';
+            });
+        }, 100);
+
+        // Inizializzazione delle icone Lucide
+        if (typeof lucide !== 'undefined') {
+            lucide.createIcons();
+        }
+    });
+</script>
+
+</body>
+</html>
