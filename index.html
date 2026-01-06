@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Esplorando lo Spazio</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lucide is loaded synchronously, so its API (lucide.createIcons) is available right after. -->
     <script src="https://unpkg.com/lucide@latest"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
 
@@ -147,9 +148,10 @@
         <div class="absolute inset-0 bg-gradient-to-b from-slate-950 via-blue-950 to-slate-900"></div>
         <div id="stars-container"></div>
         <div class="absolute inset-0 opacity-30">
-            <div class="absolute top-20 left-10 w-96 h-96 bg-blue-500 rounded-full mix-blend-multiply filter blur-3xl"></div>
-            <div class="absolute top-40 right-20 w-96 h-96 bg-purple-500 rounded-full mix-blend-multiply filter blur-3xl"></div>
-            <div class="absolute -bottom-8 left-1/2 w-96 h-96 bg-blue-400 rounded-full mix-blend-multiply filter blur-3xl transform -translate-x-1/2"></div>
+            <!-- Nebulae/Glow effects -->
+            <div class="absolute top-20 left-10 w-96 h-96 bg-blue-500 rounded-full mix-blend-multiply filter blur-3xl opacity-50"></div>
+            <div class="absolute top-40 right-20 w-96 h-96 bg-purple-500 rounded-full mix-blend-multiply filter blur-3xl opacity-50"></div>
+            <div class="absolute -bottom-8 left-1/2 w-96 h-96 bg-blue-400 rounded-full mix-blend-multiply filter blur-3xl transform -translate-x-1/2 opacity-50"></div>
         </div>
     </div>
 
@@ -157,7 +159,7 @@
     <div id="menu-container">
         <button
                 id="menu-toggle-button"
-                class="fixed top-6 left-6 z-[60] p-3 rounded-lg bg-blue-700 hover:bg-blue-600 transition-all duration-300 hover:shadow-lg hover:shadow-blue-500/50 group"
+                class="fixed top-6 left-6 z-[60] p-3 rounded-xl bg-blue-700 hover:bg-blue-600 transition-all duration-300 hover:shadow-lg hover:shadow-blue-500/50 group"
                 aria-label="Apri menu"
         >
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-menu w-6 h-6 text-white menu-icon"><line x1="4" x2="20" y1="12" y2="12"/><line x1="4" x2="20" y1="6" y2="6"/><line x1="4" x2="20" y1="18" y2="18"/></svg>
@@ -183,7 +185,7 @@
             </nav>
 
             <div class="absolute bottom-0 left-0 right-0 p-4 border-t border-blue-500/20 bg-gradient-to-t from-slate-950 to-transparent">
-                <p class="text-xs text-blue-300 text-center">Esplora lo spazio 🚀</p>
+                <p class="text-xs text-blue-300 text-center">Esplora lo spazio 🌌</p>
             </div>
         </div>
     </div>
@@ -198,7 +200,7 @@
             <div class="text-center">
                 <div class="mb-8">
                     <div class="text-6xl md:text-7xl font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-300 via-blue-400 to-blue-300 animate-pulse">
-                        <span role="img" aria-label="Rocket">🚀</span>
+                        <span role="img" aria-label="Rocket">🛰️</span>
                     </div>
                 </div>
                 <h1 class="text-5xl md:text-7xl font-bold text-white mb-6 drop-shadow-lg">
@@ -215,7 +217,7 @@
             <div class="max-w-4xl mx-auto text-center mb-12">
                 <p class="text-sm uppercase tracking-[0.35em] text-blue-300 mb-3">Linea del Tempo</p>
                 <h2 class="text-3xl md:text-4xl font-extrabold text-white mb-4">
-                    Linea del Tempo Cosmica
+                    Storia Cosmica in Breve
                 </h2>
                 <p class="text-blue-200">
                     Dalla nascita dell'universo fino all'era dell'uomo.
@@ -320,6 +322,15 @@
 
         <!-- SEZIONE AGENZIE SPAZIALI -->
         <section id="info-section" class="relative z-20 px-4 py-20 md:py-32">
+            <div class="max-w-4xl mx-auto text-center mb-12">
+                <p class="text-sm uppercase tracking-[0.35em] text-blue-300 mb-3">Leader Mondiali</p>
+                <h2 class="text-3xl md:text-4xl font-extrabold text-white mb-4">
+                    Agenzie Aerospaziali Chiave
+                </h2>
+                <p class="text-blue-200">
+                    Le organizzazioni che guidano l'esplorazione del cosmo. Clicca sui pannelli per i dettagli!
+                </p>
+            </div>
             <div id="panels-container" class="max-w-3xl mx-auto space-y-6"></div>
         </section>
 
@@ -334,6 +345,7 @@
     const spaceAgencies = [
         {
             title: 'NASA',
+            icon: 'rocket',
             content: `
                 <p class="mb-3">La National Aeronautics and Space Administration (NASA) è l'agenzia spaziale civile degli Stati Uniti e leader mondiale nell'esplorazione e nella ricerca aerospaziale.</p>
                 <ul class="list-disc ml-5 space-y-2 text-blue-100/90">
@@ -361,6 +373,7 @@
         },
         {
             title: 'ESA',
+            icon: 'globe',
             content: `
                 <p class="mb-3">L'Agenzia Spaziale Europea (ESA) è l'organizzazione intergovernativa che coordina l'esplorazione spaziale europea per scopi pacifici.</p>
                 <ul class="list-disc ml-5 space-y-2 text-blue-100/90">
@@ -382,6 +395,7 @@
         },
         {
             title: 'ROSCOSMOS',
+            icon: 'russian-ruble',
             content: `
                 <p class="mb-3">L'Agenzia Spaziale Federale Russa (Roscosmos) è responsabile del programma spaziale russo e continua la ricca eredità spaziale sovietica.</p>
                 <ul class="list-disc ml-5 space-y-2 text-blue-100/90">
@@ -401,6 +415,7 @@
         },
         {
             title: 'CNSA',
+            icon: 'mountain',
             content: `
                 <p class="mb-3">L'Amministrazione Nazionale dello Spazio della Cina (CNSA) è l'agenzia con il programma in più rapida espansione, con l'obiettivo di competere con USA e Russia.</p>
                 <ul class="list-disc ml-5 space-y-2 text-blue-100/90">
@@ -420,6 +435,7 @@
         },
         {
             title: 'ISRO',
+            icon: 'indian-rupee',
             content: `
                 <p class="mb-3">L'Organizzazione di Ricerca Spaziale Indiana (ISRO) è focalizzata sullo sviluppo autonomo di tecnologie spaziali e loro applicazione per lo sviluppo nazionale.</p>
                 <ul class="list-disc ml-5 space-y-2 text-blue-100/90">
@@ -450,6 +466,7 @@
         const icon = button.querySelector('svg:last-child');
         const isCurrentlyOpen = content.classList.contains('open');
 
+        // Chiude gli altri pannelli aperti
         document.querySelectorAll('.accordion-content.open').forEach(openContent => {
             if (openContent !== content) {
                 openContent.style.maxHeight = "0";
@@ -459,12 +476,13 @@
         });
 
         if (!isCurrentlyOpen) {
-            setTimeout(() => {
-                content.classList.add('open');
-                content.style.maxHeight = content.querySelector('div').scrollHeight + "px";
-                icon.classList.add('rotate-180');
-            }, 10);
+            // Apre il pannello corrente
+            content.classList.add('open');
+            // Assicura che l'altezza massima sia corretta
+            content.style.maxHeight = content.querySelector('div').scrollHeight + "px";
+            icon.classList.add('rotate-180');
         } else {
+            // Chiude il pannello corrente
             content.style.maxHeight = "0";
             content.classList.remove('open');
             icon.classList.remove('rotate-180');
@@ -475,6 +493,7 @@
         const id = createId(title);
         const element = document.getElementById(id);
         if (element) {
+            // Offset per la barra fissa in alto (se presente) e per un po' di margine
             const yOffset = -80;
             const y = element.getBoundingClientRect().top + window.scrollY + yOffset;
             window.scrollTo({ top: y, behavior: 'smooth' });
@@ -506,12 +525,14 @@
             overlay.classList.remove('opacity-0', 'invisible');
             overlay.classList.add('opacity-100', 'visible');
             button.classList.add('open');
+            document.body.style.overflow = 'hidden'; // Prevents scrolling when menu is open
         } else {
             sidebar.classList.remove('translate-x-0');
             sidebar.classList.add('-translate-x-full');
             overlay.classList.remove('opacity-100', 'visible');
             overlay.classList.add('opacity-0', 'invisible');
             button.classList.remove('open');
+            document.body.style.overflow = ''; // Restores scrolling
         }
     }
 
@@ -525,11 +546,10 @@
         let linksHtml = `
             <button
                 data-target="timeline-section"
-                class="w-full text-left px-4 py-3 rounded-lg text-blue-100 hover:text-white hover:bg-blue-700/50 transition-all duration-200 transform hover:translate-x-2 hover:shadow-lg hover:shadow-blue-500/30 font-medium whitespace-nowrap mb-2"
-                style="animation-delay: 0ms;"
+                class="w-full text-left px-4 py-3 rounded-xl text-blue-100 hover:text-white hover:bg-blue-700/50 transition-all duration-200 transform hover:translate-x-2 hover:shadow-lg hover:shadow-blue-500/30 font-medium whitespace-nowrap mb-2"
             >
                 <span class="inline-block mr-3 text-lg align-middle">🕒</span>
-                Linea del Tempo Cosmica
+                Linea del Tempo
             </button>
         `;
 
@@ -538,10 +558,10 @@
             linksHtml += `
                 <button
                     data-title="${agency.title}"
-                    class="w-full text-left px-4 py-3 rounded-lg text-blue-100 hover:text-white hover:bg-blue-700/50 transition-all duration-200 transform hover:translate-x-2 hover:shadow-lg hover:shadow-blue-500/30 font-medium whitespace-nowrap"
+                    class="w-full text-left px-4 py-3 rounded-xl text-blue-100 hover:text-white hover:bg-blue-700/50 transition-all duration-200 transform hover:translate-x-2 hover:shadow-lg hover:shadow-blue-500/30 font-medium whitespace-nowrap"
                     style="animation-delay: ${(index + 1) * 50}ms;"
                 >
-                    <span class="inline-block mr-3 text-lg align-middle">→</span>
+                    <svg data-lucide="${agency.icon}" class="w-5 h-5 inline-block mr-3 align-middle"></svg>
                     ${agency.title}
                 </button>
             `;
@@ -594,13 +614,16 @@
                         onclick="toggleAccordion(this)"
                     >
                         <div class="flex items-center justify-between">
-                            <h3 class="text-xl font-bold text-white capitalize">${agency.title}</h3>
-                            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-down h-6 w-6 text-white transition-transform duration-300"><path d="m6 9 6 6 6-6"/></svg>
+                            <h3 class="text-xl font-bold text-white capitalize flex items-center">
+                                <svg data-lucide="${agency.icon}" class="w-6 h-6 mr-3 text-blue-200"></svg>
+                                ${agency.title}
+                            </h3>
+                            <svg data-lucide="chevron-down" class="lucide lucide-chevron-down h-6 w-6 text-white transition-transform duration-300"></svg>
                         </div>
                     </button>
 
-                    <div class="accordion-content border-2 border-t-0 border-blue-700 bg-blue-50/10 backdrop-blur-sm">
-                        <div class="p-6 pt-4">${agency.content}</div>
+                    <div class="accordion-content border-x-2 border-b-2 border-blue-700/50 bg-blue-50/10 backdrop-blur-sm rounded-b-2xl">
+                        <div class="p-6 pt-4 text-blue-100">${agency.content}</div>
                     </div>
                 </div>
             `;
@@ -616,7 +639,7 @@
             <div class="fixed bottom-8 left-1/2 -translate-x-1/2 z-10 animate-bounce transition-opacity duration-300" id="scroll-indicator">
                 <div class="flex flex-col items-center gap-2">
                     <span class="text-sm text-blue-300 font-medium">Scorri per scoprire</span>
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="lucide lucide-chevron-down h-6 w-6 text-blue-400"><path d="m6 9 6 6 6-6"/></svg>
+                    <svg data-lucide="chevron-down" class="lucide lucide-chevron-down h-6 w-6 text-blue-400"></svg>
                 </div>
             </div>
         `;
@@ -624,6 +647,7 @@
         if (indicator) {
             window.addEventListener('scroll', () => {
                 indicator.style.opacity = window.scrollY < 100 ? '1' : '0';
+                // Prevents pointer events on the indicator when hidden
                 indicator.style.pointerEvents = window.scrollY < 100 ? 'auto' : 'none';
             });
         }
@@ -665,15 +689,19 @@
         renderScrollIndicator();
         renderMenuLinks();
 
-        setTimeout(() => {
-            document.querySelectorAll('.fade-in-up').forEach((el) => {
-                el.style.animationName = 'fadeInUp';
-            });
-        }, 100);
-
+        // Initialize Lucide icons after the dynamic content is rendered
         if (typeof lucide !== 'undefined') {
             lucide.createIcons();
         }
+
+        // Trigger fade-in animation slightly after DOMContentLoaded
+        setTimeout(() => {
+            document.querySelectorAll('.fade-in-up').forEach((el) => {
+                // By dynamically setting the animationName, we ensure the '0%' state (opacity: 0) is applied
+                // before the animation starts, preventing flickering.
+                el.style.animationName = 'fadeInUp';
+            });
+        }, 100);
     });
 </script>
 
